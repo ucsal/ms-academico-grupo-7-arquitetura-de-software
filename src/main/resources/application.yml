@@ -28,6 +28,10 @@ spring:
           allow_jdbc_metadata_access: false
         format_sql: true
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
 logging:
   level:
     root: info
