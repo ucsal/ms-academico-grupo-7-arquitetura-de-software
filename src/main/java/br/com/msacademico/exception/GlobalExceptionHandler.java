@@ -4,13 +4,16 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -20,6 +23,20 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.NOT_FOUND;
+        return ResponseEntity.status(status).body(buildErrorResponse(
+                status,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        ));
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusiness(
+            BusinessException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
         return ResponseEntity.status(status).body(buildErrorResponse(
                 status,
                 exception.getMessage(),
@@ -80,6 +97,50 @@ public class GlobalExceptionHandler {
                 "Parametro invalido: " + parameterName,
                 request.getRequestURI(),
                 List.of(new FieldErrorResponse(parameterName, "Valor informado possui formato invalido."))
+        ));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleMessageNotReadable(
+            HttpMessageNotReadableException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status).body(buildErrorResponse(
+                status,
+                "Corpo da requisicao invalido ou mal formatado.",
+                request.getRequestURI(),
+                List.of()
+        ));
+    }
+
+    @ExceptionHandler(InternalServerException.class)
+    public ResponseEntity<ErrorResponse> handleInternalServer(
+            InternalServerException exception,
+            HttpServletRequest request
+    ) {
+        log.error("Erro interno tratado na requisicao {}", request.getRequestURI(), exception);
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        return ResponseEntity.status(status).body(buildErrorResponse(
+                status,
+                exception.getMessage(),
+                request.getRequestURI(),
+                List.of()
+        ));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpected(
+            Exception exception,
+            HttpServletRequest request
+    ) {
+        log.error("Erro inesperado na requisicao {}", request.getRequestURI(), exception);
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        return ResponseEntity.status(status).body(buildErrorResponse(
+                status,
+                "Erro interno no servidor.",
+                request.getRequestURI(),
+                List.of()
         ));
     }
 
