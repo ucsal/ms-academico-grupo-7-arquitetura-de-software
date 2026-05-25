@@ -1,13 +1,17 @@
 package br.com.msacademico.controller;
 
+import br.com.msacademico.dto.ApiResponse;
 import br.com.msacademico.dto.MatrizRequest;
 import br.com.msacademico.dto.MatrizResponse;
 import br.com.msacademico.service.MatrizService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.net.URI;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,26 +32,29 @@ public class MatrizController {
     private final MatrizService matrizService;
 
     @PostMapping
-    public ResponseEntity<MatrizResponse> criar(@Valid @RequestBody MatrizRequest request) {
+    public ResponseEntity<ApiResponse<MatrizResponse>> criar(@Valid @RequestBody MatrizRequest request) {
         MatrizResponse response = matrizService.criar(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(response.id())
                 .toUri();
 
-        return ResponseEntity.created(location).body(response);
+        return ResponseEntity.created(location)
+                .body(ApiResponse.of("Matriz criada com sucesso.", response));
     }
 
     @GetMapping
-    public ResponseEntity<List<MatrizResponse>> listar() {
-        return ResponseEntity.ok(matrizService.listar());
+    public ResponseEntity<ApiResponse<Page<MatrizResponse>>> listar(
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(ApiResponse.of("Matrizes listadas com sucesso.", matrizService.listar(pageable)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MatrizResponse> buscarPorId(
+    public ResponseEntity<ApiResponse<MatrizResponse>> buscarPorId(
             @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
     ) {
-        return ResponseEntity.ok(matrizService.buscarPorId(id));
+        return ResponseEntity.ok(ApiResponse.of("Matriz encontrada com sucesso.", matrizService.buscarPorId(id)));
     }
 
     @DeleteMapping("/{id}")

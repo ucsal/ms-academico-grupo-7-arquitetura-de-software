@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -97,6 +98,22 @@ public class GlobalExceptionHandler {
                 "Parametro invalido: " + parameterName,
                 request.getRequestURI(),
                 List.of(new FieldErrorResponse(parameterName, "Valor informado possui formato invalido."))
+        ));
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidSortProperty(
+            PropertyReferenceException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String propertyName = exception.getPropertyName();
+
+        return ResponseEntity.status(status).body(buildErrorResponse(
+                status,
+                "Parametro de ordenacao invalido: " + propertyName,
+                request.getRequestURI(),
+                List.of(new FieldErrorResponse("sort", "Campo informado para ordenacao nao existe."))
         ));
     }
 

@@ -5,8 +5,9 @@ import br.com.msacademico.dto.EscolaResponse;
 import br.com.msacademico.exception.ResourceNotFoundException;
 import br.com.msacademico.model.Escola;
 import br.com.msacademico.repository.EscolaRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +27,9 @@ public class EscolaService {
     }
 
     @Transactional(readOnly = true)
-    public List<EscolaResponse> listar() {
-        return escolaRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<EscolaResponse> listar(Pageable pageable) {
+        return escolaRepository.findAll(pageable)
+                .map(this::toResponse);
     }
 
     @Transactional(readOnly = true)

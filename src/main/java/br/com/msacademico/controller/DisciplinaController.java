@@ -1,13 +1,17 @@
 package br.com.msacademico.controller;
 
+import br.com.msacademico.dto.ApiResponse;
 import br.com.msacademico.dto.DisciplinaRequest;
 import br.com.msacademico.dto.DisciplinaResponse;
 import br.com.msacademico.service.DisciplinaService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.net.URI;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,26 +32,35 @@ public class DisciplinaController {
     private final DisciplinaService disciplinaService;
 
     @PostMapping
-    public ResponseEntity<DisciplinaResponse> criar(@Valid @RequestBody DisciplinaRequest request) {
+    public ResponseEntity<ApiResponse<DisciplinaResponse>> criar(@Valid @RequestBody DisciplinaRequest request) {
         DisciplinaResponse response = disciplinaService.criar(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(response.id())
                 .toUri();
 
-        return ResponseEntity.created(location).body(response);
+        return ResponseEntity.created(location)
+                .body(ApiResponse.of("Disciplina criada com sucesso.", response));
     }
 
     @GetMapping
-    public ResponseEntity<List<DisciplinaResponse>> listar() {
-        return ResponseEntity.ok(disciplinaService.listar());
+    public ResponseEntity<ApiResponse<Page<DisciplinaResponse>>> listar(
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(ApiResponse.of(
+                "Disciplinas listadas com sucesso.",
+                disciplinaService.listar(pageable)
+        ));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DisciplinaResponse> buscarPorId(
+    public ResponseEntity<ApiResponse<DisciplinaResponse>> buscarPorId(
             @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
     ) {
-        return ResponseEntity.ok(disciplinaService.buscarPorId(id));
+        return ResponseEntity.ok(ApiResponse.of(
+                "Disciplina encontrada com sucesso.",
+                disciplinaService.buscarPorId(id)
+        ));
     }
 
     @DeleteMapping("/{id}")

@@ -1,13 +1,17 @@
 package br.com.msacademico.controller;
 
+import br.com.msacademico.dto.ApiResponse;
 import br.com.msacademico.dto.EscolaRequest;
 import br.com.msacademico.dto.EscolaResponse;
 import br.com.msacademico.service.EscolaService;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,26 +32,29 @@ public class EscolaController {
     private final EscolaService escolaService;
 
     @PostMapping
-    public ResponseEntity<EscolaResponse> criar(@Valid @RequestBody EscolaRequest request) {
+    public ResponseEntity<ApiResponse<EscolaResponse>> criar(@Valid @RequestBody EscolaRequest request) {
         EscolaResponse response = escolaService.criar(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(response.id())
                 .toUri();
 
-        return ResponseEntity.created(location).body(response);
+        return ResponseEntity.created(location)
+                .body(ApiResponse.of("Escola criada com sucesso.", response));
     }
 
     @GetMapping
-    public ResponseEntity<List<EscolaResponse>> listar() {
-        return ResponseEntity.ok(escolaService.listar());
+    public ResponseEntity<ApiResponse<Page<EscolaResponse>>> listar(
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(ApiResponse.of("Escolas listadas com sucesso.", escolaService.listar(pageable)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EscolaResponse> buscarPorId(
+    public ResponseEntity<ApiResponse<EscolaResponse>> buscarPorId(
             @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
     ) {
-        return ResponseEntity.ok(escolaService.buscarPorId(id));
+        return ResponseEntity.ok(ApiResponse.of("Escola encontrada com sucesso.", escolaService.buscarPorId(id)));
     }
 
     @DeleteMapping("/{id}")

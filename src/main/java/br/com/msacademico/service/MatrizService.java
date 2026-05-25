@@ -10,8 +10,9 @@ import br.com.msacademico.model.Escola;
 import br.com.msacademico.model.Matriz;
 import br.com.msacademico.repository.CursoRepository;
 import br.com.msacademico.repository.MatrizRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,11 +35,9 @@ public class MatrizService {
     }
 
     @Transactional(readOnly = true)
-    public List<MatrizResponse> listar() {
-        return matrizRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<MatrizResponse> listar(Pageable pageable) {
+        return matrizRepository.findAll(pageable)
+                .map(this::toResponse);
     }
 
     @Transactional(readOnly = true)
