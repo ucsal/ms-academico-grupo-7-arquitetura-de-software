@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/escolas")
+@RequestMapping("/api/escolas")
 @RequiredArgsConstructor
 @Validated
 public class EscolaController {

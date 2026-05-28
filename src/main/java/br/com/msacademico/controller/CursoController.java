@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/cursos")
+@RequestMapping("/api/cursos")
 @RequiredArgsConstructor
 @Validated
 public class CursoController {
