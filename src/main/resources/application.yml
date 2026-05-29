@@ -1,9 +1,11 @@
 server:
-  port: 8081
+  port: ${SERVER_PORT:8082}
 
 debug: false
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: ms-academico
   datasource:
@@ -19,7 +21,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-    ddl-auto: update
+      ddl-auto: ${JPA_DDL_AUTO:update}
     open-in-view: false
     show-sql: false
     properties:
@@ -34,10 +36,10 @@ springdoc:
 
 eureka:
   client:
-    register-with-eureka: true
-    fetch-registry: true
+    register-with-eureka: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA:false}
+    fetch-registry: ${EUREKA_CLIENT_FETCH_REGISTRY:false}
     service-url:
-      defaultZone: ${EUREKA_DEFAULT_ZONE:http://localhost:8761/eureka}
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
   instance:
     prefer-ip-address: true
 
