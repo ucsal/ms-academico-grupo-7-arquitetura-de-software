@@ -1,4 +1,4 @@
-# ms-academico
+# ms-academico-grupo-7-arquitetura-de-software
 
 Microservico academico criado com Java 17, Spring Boot e Maven para gerenciar
 escolas, cursos, matrizes curriculares e disciplinas.

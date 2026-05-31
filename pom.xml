@@ -12,9 +12,9 @@
     </parent>
 
     <groupId>br.com</groupId>
-    <artifactId>ms-academico</artifactId>
+    <artifactId>ms-academico-grupo-7-arquitetura-de-software</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ms-academico</name>
+    <name>ms-academico-grupo-7-arquitetura-de-software</name>
     <description>Microservico academico baseado em Java 17 e Spring Boot.</description>
 
     <properties>

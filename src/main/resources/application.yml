@@ -7,7 +7,7 @@ spring:
   config:
     import: optional:file:.env[.properties]
   application:
-    name: ms-academico
+    name: ms-academico-grupo-7-arquitetura-de-software
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
