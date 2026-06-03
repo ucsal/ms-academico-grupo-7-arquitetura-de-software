@@ -6,11 +6,15 @@ import br.com.msacademico.dto.DisciplinaRequest;
 import br.com.msacademico.dto.DisciplinaResponse;
 import br.com.msacademico.dto.EscolaResponse;
 import br.com.msacademico.dto.MatrizResponse;
+import br.com.msacademico.dto.ProfessorResponse;
+import br.com.msacademico.exception.BusinessException;
 import br.com.msacademico.exception.ResourceNotFoundException;
 import br.com.msacademico.model.Curso;
 import br.com.msacademico.model.Disciplina;
+import br.com.msacademico.model.DisciplinaProfessor;
 import br.com.msacademico.model.Escola;
 import br.com.msacademico.model.Matriz;
+import br.com.msacademico.repository.DisciplinaProfessorRepository;
 import br.com.msacademico.repository.DisciplinaRepository;
 import br.com.msacademico.repository.MatrizRepository;
 import java.util.List;
@@ -26,6 +30,7 @@ public class DisciplinaService {
 
     private final DisciplinaRepository disciplinaRepository;
     private final MatrizRepository matrizRepository;
+    private final DisciplinaProfessorRepository disciplinaProfessorRepository;
     private final PessoasClient pessoasClient;
 
     @Transactional
@@ -63,6 +68,45 @@ public class DisciplinaService {
         Long matrizId = pessoasClient.buscarAlunoPorId(alunoId).matrizId();
         return disciplinaRepository.findByMatrizId(matrizId).stream()
                 .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional
+    public ProfessorResponse vincularProfessor(Long disciplinaId, Long professorId) {
+        Disciplina disciplina = buscarEntidadePorId(disciplinaId);
+        ProfessorResponse professor = pessoasClient.buscarProfessorPorId(professorId);
+
+        if (disciplinaProfessorRepository.existsByDisciplinaIdAndProfessorId(disciplinaId, professorId)) {
+            throw new BusinessException("Professor ja vinculado a disciplina informada.");
+        }
+
+        DisciplinaProfessor disciplinaProfessor = DisciplinaProfessor.builder()
+                .disciplina(disciplina)
+                .professorId(professor.id())
+                .build();
+        disciplinaProfessorRepository.save(disciplinaProfessor);
+
+        return professor;
+    }
+
+    @Transactional
+    public void desvincularProfessor(Long disciplinaId, Long professorId) {
+        buscarEntidadePorId(disciplinaId);
+        DisciplinaProfessor disciplinaProfessor = disciplinaProfessorRepository
+                .findByDisciplinaIdAndProfessorId(disciplinaId, professorId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Vinculo entre disciplina e professor nao encontrado."
+                ));
+
+        disciplinaProfessorRepository.delete(disciplinaProfessor);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProfessorResponse> listarProfessores(Long disciplinaId) {
+        buscarEntidadePorId(disciplinaId);
+        return disciplinaProfessorRepository.findByDisciplinaId(disciplinaId).stream()
+                .map(DisciplinaProfessor::getProfessorId)
+                .map(pessoasClient::buscarProfessorPorId)
                 .toList();
     }
 
