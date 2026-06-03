@@ -44,6 +44,17 @@ public class CursoService {
     }
 
     @Transactional
+    public CursoResponse atualizar(Long id, CursoRequest request) {
+        Curso curso = buscarEntidadePorId(id);
+        Escola escola = buscarEscolaPorId(request.escolaId());
+
+        curso.setNome(request.nome().trim());
+        curso.setEscola(escola);
+
+        return toResponse(cursoRepository.save(curso));
+    }
+
+    @Transactional
     public void excluir(Long id) {
         Curso curso = buscarEntidadePorId(id);
         cursoRepository.delete(curso);

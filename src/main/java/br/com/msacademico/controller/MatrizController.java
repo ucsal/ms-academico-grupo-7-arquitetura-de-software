@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,6 +56,14 @@ public class MatrizController {
             @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
     ) {
         return ResponseEntity.ok(ApiResponse.of("Matriz encontrada com sucesso.", matrizService.buscarPorId(id)));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<MatrizResponse>> atualizar(
+            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
+            @Valid @RequestBody MatrizRequest request
+    ) {
+        return ResponseEntity.ok(ApiResponse.of("Matriz atualizada com sucesso.", matrizService.atualizar(id, request)));
     }
 
     @DeleteMapping("/{id}")

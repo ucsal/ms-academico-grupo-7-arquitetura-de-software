@@ -46,6 +46,17 @@ public class MatrizService {
     }
 
     @Transactional
+    public MatrizResponse atualizar(Long id, MatrizRequest request) {
+        Matriz matriz = buscarEntidadePorId(id);
+        Curso curso = buscarCursoPorId(request.cursoId());
+
+        matriz.setCodigo(request.codigo().trim());
+        matriz.setCurso(curso);
+
+        return toResponse(matrizRepository.save(matriz));
+    }
+
+    @Transactional
     public void excluir(Long id) {
         Matriz matriz = buscarEntidadePorId(id);
         matrizRepository.delete(matriz);

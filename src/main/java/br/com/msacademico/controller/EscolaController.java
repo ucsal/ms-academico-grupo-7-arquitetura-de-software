@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,6 +56,14 @@ public class EscolaController {
             @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
     ) {
         return ResponseEntity.ok(ApiResponse.of("Escola encontrada com sucesso.", escolaService.buscarPorId(id)));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<EscolaResponse>> atualizar(
+            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
+            @Valid @RequestBody EscolaRequest request
+    ) {
+        return ResponseEntity.ok(ApiResponse.of("Escola atualizada com sucesso.", escolaService.atualizar(id, request)));
     }
 
     @DeleteMapping("/{id}")
