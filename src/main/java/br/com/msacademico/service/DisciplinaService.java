@@ -1,5 +1,6 @@
 package br.com.msacademico.service;
 
+import br.com.msacademico.client.PessoasClient;
 import br.com.msacademico.dto.CursoResponse;
 import br.com.msacademico.dto.DisciplinaRequest;
 import br.com.msacademico.dto.DisciplinaResponse;
@@ -12,6 +13,7 @@ import br.com.msacademico.model.Escola;
 import br.com.msacademico.model.Matriz;
 import br.com.msacademico.repository.DisciplinaRepository;
 import br.com.msacademico.repository.MatrizRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,7 @@ public class DisciplinaService {
 
     private final DisciplinaRepository disciplinaRepository;
     private final MatrizRepository matrizRepository;
+    private final PessoasClient pessoasClient;
 
     @Transactional
     public DisciplinaResponse criar(DisciplinaRequest request) {
@@ -46,6 +49,14 @@ public class DisciplinaService {
     @Transactional(readOnly = true)
     public DisciplinaResponse buscarPorId(Long id) {
         return toResponse(buscarEntidadePorId(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<DisciplinaResponse> listarDisponiveis(Long alunoId) {
+        Long matrizId = pessoasClient.buscarAlunoPorId(alunoId).matrizId();
+        return disciplinaRepository.findByMatrizId(matrizId).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     @Transactional
