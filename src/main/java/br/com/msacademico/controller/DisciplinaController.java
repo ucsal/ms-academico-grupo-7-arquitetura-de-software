@@ -55,6 +55,14 @@ public class DisciplinaController {
         ));
     }
 
+    @GetMapping("/todas")
+    public ResponseEntity<ApiResponse<List<DisciplinaResponse>>> listarTodas() {
+        return ResponseEntity.ok(ApiResponse.of(
+                "Disciplinas listadas com sucesso.",
+                disciplinaService.listarTodas()
+        ));
+    }
+
     @GetMapping("/disponiveis")
     public ResponseEntity<ApiResponse<List<DisciplinaResponse>>> listarDisponiveis(
             @RequestParam @Positive(message = "O alunoId deve ser maior que zero.") Long alunoId

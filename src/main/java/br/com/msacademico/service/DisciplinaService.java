@@ -47,6 +47,13 @@ public class DisciplinaService {
     }
 
     @Transactional(readOnly = true)
+    public List<DisciplinaResponse> listarTodas() {
+        return disciplinaRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public DisciplinaResponse buscarPorId(Long id) {
         return toResponse(buscarEntidadePorId(id));
     }
