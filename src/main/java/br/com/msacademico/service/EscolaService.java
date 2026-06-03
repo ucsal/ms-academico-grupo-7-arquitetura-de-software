@@ -38,6 +38,14 @@ public class EscolaService {
     }
 
     @Transactional
+    public EscolaResponse atualizar(Long id, EscolaRequest request) {
+        Escola escola = buscarEntidadePorId(id);
+        escola.setNome(request.nome().trim());
+
+        return toResponse(escolaRepository.save(escola));
+    }
+
+    @Transactional
     public void excluir(Long id) {
         Escola escola = buscarEntidadePorId(id);
         escolaRepository.delete(escola);

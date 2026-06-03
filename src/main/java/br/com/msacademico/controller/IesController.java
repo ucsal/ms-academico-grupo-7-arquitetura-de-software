@@ -1,17 +1,14 @@
 package br.com.msacademico.controller;
 
 import br.com.msacademico.dto.ApiResponse;
-import br.com.msacademico.dto.EscolaRequest;
-import br.com.msacademico.dto.EscolaResponse;
-import br.com.msacademico.service.EscolaService;
-import jakarta.validation.constraints.Positive;
+import br.com.msacademico.dto.IesRequest;
+import br.com.msacademico.dto.IesResponse;
+import br.com.msacademico.service.IesService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import java.net.URI;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,52 +22,50 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/api/escolas")
+@RequestMapping("/api/ies")
 @RequiredArgsConstructor
 @Validated
-public class EscolaController {
+public class IesController {
 
-    private final EscolaService escolaService;
+    private final IesService iesService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<EscolaResponse>> criar(@Valid @RequestBody EscolaRequest request) {
-        EscolaResponse response = escolaService.criar(request);
+    public ResponseEntity<ApiResponse<IesResponse>> salvar(@Valid @RequestBody IesRequest request) {
+        IesResponse response = iesService.salvar(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(response.id())
                 .toUri();
 
         return ResponseEntity.created(location)
-                .body(ApiResponse.of("Escola criada com sucesso.", response));
+                .body(ApiResponse.of("IES criada com sucesso.", response));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<EscolaResponse>>> listar(
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
-        return ResponseEntity.ok(ApiResponse.of("Escolas listadas com sucesso.", escolaService.listar(pageable)));
+    public ResponseEntity<ApiResponse<List<IesResponse>>> listarTodos() {
+        return ResponseEntity.ok(ApiResponse.of("IES listadas com sucesso.", iesService.listarTodos()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<EscolaResponse>> buscarPorId(
+    public ResponseEntity<ApiResponse<IesResponse>> buscarPorId(
             @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
     ) {
-        return ResponseEntity.ok(ApiResponse.of("Escola encontrada com sucesso.", escolaService.buscarPorId(id)));
+        return ResponseEntity.ok(ApiResponse.of("IES encontrada com sucesso.", iesService.buscarPorId(id)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<EscolaResponse>> atualizar(
+    public ResponseEntity<ApiResponse<IesResponse>> atualizar(
             @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
-            @Valid @RequestBody EscolaRequest request
+            @Valid @RequestBody IesRequest request
     ) {
-        return ResponseEntity.ok(ApiResponse.of("Escola atualizada com sucesso.", escolaService.atualizar(id, request)));
+        return ResponseEntity.ok(ApiResponse.of("IES atualizada com sucesso.", iesService.atualizar(id, request)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(
+    public ResponseEntity<Void> deletar(
             @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
     ) {
-        escolaService.excluir(id);
+        iesService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 }
