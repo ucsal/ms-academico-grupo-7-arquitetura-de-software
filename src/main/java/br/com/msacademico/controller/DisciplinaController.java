@@ -3,6 +3,7 @@ package br.com.msacademico.controller;
 import br.com.msacademico.dto.ApiResponse;
 import br.com.msacademico.dto.DisciplinaRequest;
 import br.com.msacademico.dto.DisciplinaResponse;
+import br.com.msacademico.dto.ProfessorResponse;
 import br.com.msacademico.service.DisciplinaService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -80,6 +81,36 @@ public class DisciplinaController {
         return ResponseEntity.ok(ApiResponse.of(
                 "Disciplina encontrada com sucesso.",
                 disciplinaService.buscarPorId(id)
+        ));
+    }
+
+    @PostMapping("/{id}/professores/{professorId}")
+    public ResponseEntity<ApiResponse<ProfessorResponse>> vincularProfessor(
+            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
+            @PathVariable @Positive(message = "O professorId deve ser maior que zero.") Long professorId
+    ) {
+        return ResponseEntity.ok(ApiResponse.of(
+                "Professor vinculado a disciplina com sucesso.",
+                disciplinaService.vincularProfessor(id, professorId)
+        ));
+    }
+
+    @DeleteMapping("/{id}/professores/{professorId}")
+    public ResponseEntity<ApiResponse<Void>> desvincularProfessor(
+            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
+            @PathVariable @Positive(message = "O professorId deve ser maior que zero.") Long professorId
+    ) {
+        disciplinaService.desvincularProfessor(id, professorId);
+        return ResponseEntity.ok(ApiResponse.of("Professor desvinculado da disciplina com sucesso.", null));
+    }
+
+    @GetMapping("/{id}/professores")
+    public ResponseEntity<ApiResponse<List<ProfessorResponse>>> listarProfessores(
+            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
+    ) {
+        return ResponseEntity.ok(ApiResponse.of(
+                "Professores da disciplina listados com sucesso.",
+                disciplinaService.listarProfessores(id)
         ));
     }
 
