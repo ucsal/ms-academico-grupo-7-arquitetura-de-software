@@ -7,6 +7,7 @@ import br.com.msacademico.service.EscolaService;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,30 +47,32 @@ public class EscolaController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<EscolaResponse>>> listar(
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.of("Escolas listadas com sucesso.", escolaService.listar(pageable)));
+    }
+
+    @GetMapping("/todas")
+    public ResponseEntity<ApiResponse<List<EscolaResponse>>> listarTodas() {
+        return ResponseEntity.ok(ApiResponse.of("Escolas listadas com sucesso.", escolaService.listarTodas()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<EscolaResponse>> buscarPorId(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
-    ) {
+            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id) {
         return ResponseEntity.ok(ApiResponse.of("Escola encontrada com sucesso.", escolaService.buscarPorId(id)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<EscolaResponse>> atualizar(
             @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
-            @Valid @RequestBody EscolaRequest request
-    ) {
-        return ResponseEntity.ok(ApiResponse.of("Escola atualizada com sucesso.", escolaService.atualizar(id, request)));
+            @Valid @RequestBody EscolaRequest request) {
+        return ResponseEntity
+                .ok(ApiResponse.of("Escola atualizada com sucesso.", escolaService.atualizar(id, request)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
-    ) {
+            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id) {
         escolaService.excluir(id);
         return ResponseEntity.noContent().build();
     }

@@ -36,8 +36,8 @@ springdoc:
 
 eureka:
   client:
-    register-with-eureka: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA:false}
-    fetch-registry: ${EUREKA_CLIENT_FETCH_REGISTRY:false}
+    register-with-eureka: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA:true}
+    fetch-registry: ${EUREKA_CLIENT_FETCH_REGISTRY:true}
     service-url:
       defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
   instance:

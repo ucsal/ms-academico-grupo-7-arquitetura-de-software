@@ -8,6 +8,7 @@ import br.com.msacademico.model.Curso;
 import br.com.msacademico.model.Escola;
 import br.com.msacademico.repository.CursoRepository;
 import br.com.msacademico.repository.EscolaRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,13 @@ public class CursoService {
     public Page<CursoResponse> listar(Pageable pageable) {
         return cursoRepository.findAll(pageable)
                 .map(this::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CursoResponse> listarTodos() {
+        return cursoRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     @Transactional(readOnly = true)

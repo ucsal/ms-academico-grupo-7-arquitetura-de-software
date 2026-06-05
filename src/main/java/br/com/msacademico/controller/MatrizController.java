@@ -7,6 +7,7 @@ import br.com.msacademico.service.MatrizService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.net.URI;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,30 +47,32 @@ public class MatrizController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<MatrizResponse>>> listar(
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.of("Matrizes listadas com sucesso.", matrizService.listar(pageable)));
+    }
+
+    @GetMapping("/todas")
+    public ResponseEntity<ApiResponse<List<MatrizResponse>>> listarTodas() {
+        return ResponseEntity.ok(ApiResponse.of("Matrizes listadas com sucesso.", matrizService.listarTodas()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<MatrizResponse>> buscarPorId(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
-    ) {
+            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id) {
         return ResponseEntity.ok(ApiResponse.of("Matriz encontrada com sucesso.", matrizService.buscarPorId(id)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<MatrizResponse>> atualizar(
             @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
-            @Valid @RequestBody MatrizRequest request
-    ) {
-        return ResponseEntity.ok(ApiResponse.of("Matriz atualizada com sucesso.", matrizService.atualizar(id, request)));
+            @Valid @RequestBody MatrizRequest request) {
+        return ResponseEntity
+                .ok(ApiResponse.of("Matriz atualizada com sucesso.", matrizService.atualizar(id, request)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
-    ) {
+            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id) {
         matrizService.excluir(id);
         return ResponseEntity.noContent().build();
     }

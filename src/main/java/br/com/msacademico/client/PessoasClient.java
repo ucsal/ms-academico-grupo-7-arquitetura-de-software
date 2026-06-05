@@ -6,12 +6,20 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "ms-pessoas", url = "http://localhost:8083")
+import java.util.List;
+
+@FeignClient(name = "ms-pessoas")
 public interface PessoasClient {
 
-    @GetMapping("/alunos/{id}")
+    @GetMapping("/api/alunos/{id}")
     AlunoResponse buscarAlunoPorId(@PathVariable Long id);
 
-    @GetMapping("/professores/{id}")
+    @GetMapping("/api/professores/{id}")
     ProfessorResponse buscarProfessorPorId(@PathVariable Long id);
+
+    @GetMapping("/api/alunos")
+    List<AlunoResponse> listarAlunos();
+
+    @GetMapping("/api/professores")
+    List<ProfessorResponse> listarProfessores();
 }

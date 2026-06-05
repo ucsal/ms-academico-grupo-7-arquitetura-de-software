@@ -1,8 +1,8 @@
 package br.com.msacademico.dto;
 
 public record ProfessorResponse(
-        Long id,
-        String nome,
-        String email
-) {
+                Long id,
+                String nome,
+                String email,
+                String matricula) {
 }

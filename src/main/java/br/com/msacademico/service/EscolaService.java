@@ -6,6 +6,7 @@ import br.com.msacademico.exception.ResourceNotFoundException;
 import br.com.msacademico.model.Escola;
 import br.com.msacademico.repository.EscolaRepository;
 import lombok.RequiredArgsConstructor;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,13 @@ public class EscolaService {
     @Transactional(readOnly = true)
     public EscolaResponse buscarPorId(Long id) {
         return toResponse(buscarEntidadePorId(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<EscolaResponse> listarTodas() {
+        return escolaRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     @Transactional

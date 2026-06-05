@@ -1,7 +1,9 @@
 package br.com.msacademico.dto;
 
 public record AlunoResponse(
-        Long id,
-        Long matrizId
-) {
+                Long id,
+                String nome,
+                String email,
+                String matricula,
+                Long matrizId) {
 }
