@@ -35,11 +35,10 @@ public class DisciplinaService {
 
     @Transactional
     public DisciplinaResponse criar(DisciplinaRequest request) {
-        Matriz matriz = buscarMatrizPorId(request.matrizId());
+
         Disciplina disciplina = Disciplina.builder()
                 .nome(request.nome().trim())
                 .cargaHoraria(request.cargaHoraria())
-                .matriz(matriz)
                 .build();
 
         return toResponse(disciplinaRepository.save(disciplina));
@@ -66,8 +65,12 @@ public class DisciplinaService {
     @Transactional(readOnly = true)
     public List<DisciplinaResponse> listarDisponiveis(Long alunoId) {
         Long matrizId = pessoasClient.buscarAlunoPorId(alunoId).matrizId();
-        return disciplinaRepository.findByMatrizId(matrizId).stream()
-                .map(this::toResponse)
+
+        // Invertemos a busca: pegamos a Matriz e extraímos a lista de disciplinas que
+        // estão nela
+        Matriz matriz = buscarMatrizPorId(matrizId);
+        return matriz.getDisciplinas().stream()
+                .map(disciplina -> toResponseComMatriz(disciplina, matriz))
                 .toList();
     }
 
@@ -95,8 +98,7 @@ public class DisciplinaService {
         DisciplinaProfessor disciplinaProfessor = disciplinaProfessorRepository
                 .findByDisciplinaIdAndProfessorId(disciplinaId, professorId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Vinculo entre disciplina e professor nao encontrado."
-                ));
+                        "Vinculo entre disciplina e professor nao encontrado."));
 
         disciplinaProfessorRepository.delete(disciplinaProfessor);
     }
@@ -127,17 +129,25 @@ public class DisciplinaService {
     }
 
     private DisciplinaResponse toResponse(Disciplina disciplina) {
-        Matriz matriz = disciplina.getMatriz();
-        Curso curso = matriz.getCurso();
-        Escola escola = curso.getEscola();
-        EscolaResponse escolaResponse = new EscolaResponse(escola.getId(), escola.getNome());
-        CursoResponse cursoResponse = new CursoResponse(curso.getId(), curso.getNome(), escolaResponse);
-        MatrizResponse matrizResponse = new MatrizResponse(matriz.getId(), matriz.getCodigo(), cursoResponse);
         return new DisciplinaResponse(
                 disciplina.getId(),
                 disciplina.getNome(),
                 disciplina.getCargaHoraria(),
-                matrizResponse
-        );
+                null);
+    }
+
+    private DisciplinaResponse toResponseComMatriz(Disciplina disciplina, Matriz matriz) {
+        Curso curso = matriz.getCurso();
+        Escola escola = curso.getEscola();
+
+        EscolaResponse escolaResponse = new EscolaResponse(escola.getId(), escola.getNome());
+        CursoResponse cursoResponse = new CursoResponse(curso.getId(), curso.getNome(), escolaResponse);
+        MatrizResponse matrizResponse = new MatrizResponse(matriz.getId(), matriz.getCodigo(), cursoResponse);
+
+        return new DisciplinaResponse(
+                disciplina.getId(),
+                disciplina.getNome(),
+                disciplina.getCargaHoraria(),
+                matrizResponse);
     }
 }
