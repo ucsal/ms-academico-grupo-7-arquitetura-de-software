@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,4 +29,8 @@ public class Escola {
 
     @Column(nullable = false, length = 150)
     private String nome;
+
+    @ManyToOne
+    @JoinColumn(name = "ies_id", nullable = false)
+    private Ies ies;
 }
