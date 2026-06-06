@@ -8,5 +8,7 @@ public interface MatrizDisciplinaRepository extends JpaRepository<MatrizDiscipli
 
     List<MatrizDisciplina> findByMatrizId(Long matrizId);
 
+    List<MatrizDisciplina> findByDisciplinaId(Long disciplinaId);
+
     boolean existsByMatrizIdAndDisciplinaId(Long matrizId, Long disciplinaId);
 }

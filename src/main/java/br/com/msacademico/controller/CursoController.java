@@ -52,8 +52,8 @@ public class CursoController {
     }
 
     @GetMapping("/todos")
-    public ResponseEntity<ApiResponse<List<CursoResponse>>> listarTodos() {
-        return ResponseEntity.ok(ApiResponse.of("Cursos listados com sucesso.", cursoService.listarTodos()));
+    public ResponseEntity<List<CursoResponse>> listarTodos() {
+        return ResponseEntity.ok(cursoService.listarTodos());
     }
 
     @GetMapping("/{id}")

@@ -42,29 +42,26 @@ public class IesController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<IesResponse>>> listarTodos() {
-        return ResponseEntity.ok(ApiResponse.of("IES listadas com sucesso.", iesService.listarTodos()));
+    public ResponseEntity<List<IesResponse>> listarTodos() {
+        return ResponseEntity.ok(iesService.listarTodos());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<IesResponse>> buscarPorId(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
-    ) {
+            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id) {
         return ResponseEntity.ok(ApiResponse.of("IES encontrada com sucesso.", iesService.buscarPorId(id)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<IesResponse>> atualizar(
             @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
-            @Valid @RequestBody IesRequest request
-    ) {
+            @Valid @RequestBody IesRequest request) {
         return ResponseEntity.ok(ApiResponse.of("IES atualizada com sucesso.", iesService.atualizar(id, request)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
-    ) {
+            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id) {
         iesService.deletar(id);
         return ResponseEntity.noContent().build();
     }

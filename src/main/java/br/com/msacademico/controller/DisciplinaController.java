@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,93 +33,81 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @Validated
 public class DisciplinaController {
 
-    private final DisciplinaService disciplinaService;
+        private final DisciplinaService disciplinaService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<DisciplinaResponse>> criar(@Valid @RequestBody DisciplinaRequest request) {
-        DisciplinaResponse response = disciplinaService.criar(request);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id())
-                .toUri();
+        @PostMapping
+        public ResponseEntity<ApiResponse<DisciplinaResponse>> criar(@Valid @RequestBody DisciplinaRequest request) {
+                DisciplinaResponse response = disciplinaService.criar(request);
+                URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                                .path("/{id}")
+                                .buildAndExpand(response.id())
+                                .toUri();
 
-        return ResponseEntity.created(location)
-                .body(ApiResponse.of("Disciplina criada com sucesso.", response));
-    }
+                return ResponseEntity.created(location)
+                                .body(ApiResponse.of("Disciplina criada com sucesso.", response));
+        }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<Page<DisciplinaResponse>>> listar(
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
-        return ResponseEntity.ok(ApiResponse.of(
-                "Disciplinas listadas com sucesso.",
-                disciplinaService.listar(pageable)
-        ));
-    }
+        @GetMapping
+        public ResponseEntity<ApiResponse<Page<DisciplinaResponse>>> listar(
+                        @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+                return ResponseEntity.ok(ApiResponse.of(
+                                "Disciplinas listadas com sucesso.",
+                                disciplinaService.listar(pageable)));
+        }
 
-    @GetMapping("/todas")
-    public ResponseEntity<ApiResponse<List<DisciplinaResponse>>> listarTodas() {
-        return ResponseEntity.ok(ApiResponse.of(
-                "Disciplinas listadas com sucesso.",
-                disciplinaService.listarTodas()
-        ));
-    }
+        @GetMapping("/todas")
+        public ResponseEntity<List<DisciplinaResponse>> listarTodas() {
+                return ResponseEntity.ok(disciplinaService.listarTodas());
+        }
 
-    @GetMapping("/disponiveis")
-    public ResponseEntity<ApiResponse<List<DisciplinaResponse>>> listarDisponiveis(
-            @RequestParam @Positive(message = "O alunoId deve ser maior que zero.") Long alunoId
-    ) {
-        return ResponseEntity.ok(ApiResponse.of(
-                "Disciplinas disponiveis listadas com sucesso.",
-                disciplinaService.listarDisponiveis(alunoId)
-        ));
-    }
+        @GetMapping("/disponiveis")
+        public ResponseEntity<List<DisciplinaResponse>> listarDisponiveis(
+                        @RequestParam(required = false) Long alunoId) {
+                return ResponseEntity.ok(disciplinaService.listarDisponiveis(alunoId));
+        }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<DisciplinaResponse>> buscarPorId(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
-    ) {
-        return ResponseEntity.ok(ApiResponse.of(
-                "Disciplina encontrada com sucesso.",
-                disciplinaService.buscarPorId(id)
-        ));
-    }
+        @GetMapping("/{id}")
+        public ResponseEntity<ApiResponse<DisciplinaResponse>> buscarPorId(
+                        @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id) {
+                return ResponseEntity.ok(ApiResponse.of(
+                                "Disciplina encontrada com sucesso.",
+                                disciplinaService.buscarPorId(id)));
+        }
 
-    @PostMapping("/{id}/professores/{professorId}")
-    public ResponseEntity<ApiResponse<ProfessorResponse>> vincularProfessor(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
-            @PathVariable @Positive(message = "O professorId deve ser maior que zero.") Long professorId
-    ) {
-        return ResponseEntity.ok(ApiResponse.of(
-                "Professor vinculado a disciplina com sucesso.",
-                disciplinaService.vincularProfessor(id, professorId)
-        ));
-    }
+        @PostMapping("/{id}/professores/{professorId}")
+        public ResponseEntity<ApiResponse<ProfessorResponse>> vincularProfessor(
+                        @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
+                        @PathVariable @Positive(message = "O professorId deve ser maior que zero.") Long professorId) {
+                return ResponseEntity.ok(ApiResponse.of(
+                                "Professor vinculado a disciplina com sucesso.",
+                                disciplinaService.vincularProfessor(id, professorId)));
+        }
 
-    @DeleteMapping("/{id}/professores/{professorId}")
-    public ResponseEntity<ApiResponse<Void>> desvincularProfessor(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
-            @PathVariable @Positive(message = "O professorId deve ser maior que zero.") Long professorId
-    ) {
-        disciplinaService.desvincularProfessor(id, professorId);
-        return ResponseEntity.ok(ApiResponse.of("Professor desvinculado da disciplina com sucesso.", null));
-    }
+        @DeleteMapping("/{id}/professores/{professorId}")
+        public ResponseEntity<ApiResponse<Void>> desvincularProfessor(
+                        @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
+                        @PathVariable @Positive(message = "O professorId deve ser maior que zero.") Long professorId) {
+                disciplinaService.desvincularProfessor(id, professorId);
+                return ResponseEntity.ok(ApiResponse.of("Professor desvinculado da disciplina com sucesso.", null));
+        }
 
-    @GetMapping("/{id}/professores")
-    public ResponseEntity<ApiResponse<List<ProfessorResponse>>> listarProfessores(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
-    ) {
-        return ResponseEntity.ok(ApiResponse.of(
-                "Professores da disciplina listados com sucesso.",
-                disciplinaService.listarProfessores(id)
-        ));
-    }
+        @GetMapping("/{id}/professores")
+        public ResponseEntity<List<ProfessorResponse>> listarProfessores(
+                        @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id) {
+                return ResponseEntity.ok(disciplinaService.listarProfessores(id));
+        }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
-    ) {
-        disciplinaService.excluir(id);
-        return ResponseEntity.noContent().build();
-    }
+        @PutMapping("/{id}")
+        public ResponseEntity<DisciplinaResponse> atualizar(
+                        @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
+                        @Valid @RequestBody DisciplinaRequest request) {
+                return ResponseEntity.ok(disciplinaService.atualizar(id, request));
+        }
+
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> excluir(
+                        @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id) {
+                disciplinaService.excluir(id);
+                return ResponseEntity.noContent().build();
+        }
 }

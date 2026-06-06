@@ -26,54 +26,42 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class MatrizDisciplinaController {
 
-    private final MatrizDisciplinaService matrizDisciplinaService;
+        private final MatrizDisciplinaService matrizDisciplinaService;
 
-    @PostMapping("/lote")
-    public ResponseEntity<ApiResponse<List<MatrizDisciplinaResponse>>> salvarEmLote(
-            @Valid @RequestBody MatrizDisciplinaLoteRequest request
-    ) {
-        return ResponseEntity.status(201).body(ApiResponse.of(
-                "Disciplinas vinculadas a matriz com sucesso.",
-                matrizDisciplinaService.salvarEmLote(request)
-        ));
-    }
+        @PostMapping("/lote")
+        public ResponseEntity<List<MatrizDisciplinaResponse>> salvarEmLote(
+                        @Valid @RequestBody MatrizDisciplinaLoteRequest request) {
+                return ResponseEntity.status(201).body(matrizDisciplinaService.salvarEmLote(request));
+        }
 
-    @GetMapping("/matriz/{matrizId}")
-    public ResponseEntity<ApiResponse<List<MatrizDisciplinaResponse>>> listarPorMatriz(
-            @PathVariable @Positive(message = "O matrizId deve ser maior que zero.") Long matrizId
-    ) {
-        return ResponseEntity.ok(ApiResponse.of(
-                "Disciplinas vinculadas a matriz listadas com sucesso.",
-                matrizDisciplinaService.listarPorMatriz(matrizId)
-        ));
-    }
+        @GetMapping
+        public ResponseEntity<List<MatrizDisciplinaResponse>> listarTodas() {
+                return ResponseEntity.ok(matrizDisciplinaService.listarTodas());
+        }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<MatrizDisciplinaResponse>> buscarPorId(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
-    ) {
-        return ResponseEntity.ok(ApiResponse.of(
-                "Vinculo entre matriz e disciplina encontrado com sucesso.",
-                matrizDisciplinaService.buscarPorId(id)
-        ));
-    }
+        @GetMapping("/matriz/{matrizId}")
+        public ResponseEntity<List<MatrizDisciplinaResponse>> listarPorMatriz(
+                        @PathVariable @Positive(message = "O matrizId deve ser maior que zero.") Long matrizId) {
+                return ResponseEntity.ok(matrizDisciplinaService.listarPorMatriz(matrizId));
+        }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<MatrizDisciplinaResponse>> atualizar(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
-            @Valid @RequestBody MatrizDisciplinaRequest request
-    ) {
-        return ResponseEntity.ok(ApiResponse.of(
-                "Vinculo entre matriz e disciplina atualizado com sucesso.",
-                matrizDisciplinaService.atualizar(id, request)
-        ));
-    }
+        @GetMapping("/{id}")
+        public ResponseEntity<MatrizDisciplinaResponse> buscarPorId(
+                        @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id) {
+                return ResponseEntity.ok(matrizDisciplinaService.buscarPorId(id));
+        }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(
-            @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id
-    ) {
-        matrizDisciplinaService.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
+        @PutMapping("/{id}")
+        public ResponseEntity<MatrizDisciplinaResponse> atualizar(
+                        @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id,
+                        @Valid @RequestBody MatrizDisciplinaRequest request) {
+                return ResponseEntity.ok(matrizDisciplinaService.atualizar(id, request));
+        }
+
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> deletar(
+                        @PathVariable @Positive(message = "O id deve ser maior que zero.") Long id) {
+                matrizDisciplinaService.deletar(id);
+                return ResponseEntity.noContent().build();
+        }
 }

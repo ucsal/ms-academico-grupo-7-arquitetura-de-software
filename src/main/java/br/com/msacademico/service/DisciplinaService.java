@@ -1,21 +1,20 @@
 package br.com.msacademico.service;
 
 import br.com.msacademico.client.PessoasClient;
-import br.com.msacademico.dto.CursoResponse;
+import br.com.msacademico.dto.AlunoResponse;
 import br.com.msacademico.dto.DisciplinaRequest;
 import br.com.msacademico.dto.DisciplinaResponse;
-import br.com.msacademico.dto.EscolaResponse;
-import br.com.msacademico.dto.MatrizResponse;
+import br.com.msacademico.dto.MatrizResumida;
 import br.com.msacademico.dto.ProfessorResponse;
 import br.com.msacademico.exception.BusinessException;
 import br.com.msacademico.exception.ResourceNotFoundException;
-import br.com.msacademico.model.Curso;
 import br.com.msacademico.model.Disciplina;
 import br.com.msacademico.model.DisciplinaProfessor;
 import br.com.msacademico.model.Escola;
-import br.com.msacademico.model.Matriz;
 import br.com.msacademico.repository.DisciplinaProfessorRepository;
 import br.com.msacademico.repository.DisciplinaRepository;
+import br.com.msacademico.repository.EscolaRepository;
+import br.com.msacademico.repository.MatrizDisciplinaRepository;
 import br.com.msacademico.repository.MatrizRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,17 +29,22 @@ public class DisciplinaService {
 
     private final DisciplinaRepository disciplinaRepository;
     private final MatrizRepository matrizRepository;
+    private final MatrizDisciplinaRepository matrizDisciplinaRepository;
     private final DisciplinaProfessorRepository disciplinaProfessorRepository;
+    private final EscolaRepository escolaRepository;
     private final PessoasClient pessoasClient;
 
     @Transactional
     public DisciplinaResponse criar(DisciplinaRequest request) {
-
         Disciplina disciplina = Disciplina.builder()
-                .nome(request.nome().trim())
+                .sigla(request.sigla().trim())
+                .descricao(request.descricao().trim())
+                .nome(request.sigla().trim())
                 .cargaHoraria(request.cargaHoraria())
+                .escolaId(request.escolaId())
+                .dataCadastro(java.time.LocalDateTime.now().toString())
+                .status("ATIVO")
                 .build();
-
         return toResponse(disciplinaRepository.save(disciplina));
     }
 
@@ -64,14 +68,24 @@ public class DisciplinaService {
 
     @Transactional(readOnly = true)
     public List<DisciplinaResponse> listarDisponiveis(Long alunoId) {
-        Long matrizId = pessoasClient.buscarAlunoPorId(alunoId).matrizId();
+        AlunoResponse aluno;
+        try {
+            aluno = (alunoId != null)
+                    ? pessoasClient.buscarAlunoPorId(alunoId)
+                    : pessoasClient.buscarAlunoAtual();
+        } catch (Exception e) {
+            return List.of();
+        }
 
-        // Invertemos a busca: pegamos a Matriz e extraímos a lista de disciplinas que
-        // estão nela
-        Matriz matriz = buscarMatrizPorId(matrizId);
-        return matriz.getDisciplinas().stream()
-                .map(disciplina -> toResponseComMatriz(disciplina, matriz))
-                .toList();
+        if (aluno.matrizId() == null) {
+            return List.of();
+        }
+
+        return matrizRepository.findById(aluno.matrizId())
+                .map(matriz -> matriz.getDisciplinas().stream()
+                        .map(this::toResponse)
+                        .toList())
+                .orElse(List.of());
     }
 
     @Transactional
@@ -113,6 +127,17 @@ public class DisciplinaService {
     }
 
     @Transactional
+    public DisciplinaResponse atualizar(Long id, DisciplinaRequest request) {
+        Disciplina disciplina = buscarEntidadePorId(id);
+        disciplina.setSigla(request.sigla().trim());
+        disciplina.setDescricao(request.descricao().trim());
+        disciplina.setNome(request.sigla().trim());
+        disciplina.setCargaHoraria(request.cargaHoraria());
+        disciplina.setEscolaId(request.escolaId());
+        return toResponse(disciplinaRepository.save(disciplina));
+    }
+
+    @Transactional
     public void excluir(Long id) {
         Disciplina disciplina = buscarEntidadePorId(id);
         disciplinaRepository.delete(disciplina);
@@ -123,31 +148,29 @@ public class DisciplinaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Disciplina nao encontrada com id: " + id));
     }
 
-    private Matriz buscarMatrizPorId(Long id) {
-        return matrizRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Matriz nao encontrada com id: " + id));
-    }
-
     private DisciplinaResponse toResponse(Disciplina disciplina) {
-        return new DisciplinaResponse(
-                disciplina.getId(),
-                disciplina.getNome(),
-                disciplina.getCargaHoraria(),
-                null);
-    }
+        String escolaNome = null;
+        if (disciplina.getEscolaId() != null) {
+            escolaNome = escolaRepository.findById(disciplina.getEscolaId())
+                    .map(Escola::getNome)
+                    .orElse(null);
+        }
 
-    private DisciplinaResponse toResponseComMatriz(Disciplina disciplina, Matriz matriz) {
-        Curso curso = matriz.getCurso();
-        Escola escola = curso.getEscola();
-
-        EscolaResponse escolaResponse = new EscolaResponse(escola.getId(), escola.getNome());
-        CursoResponse cursoResponse = new CursoResponse(curso.getId(), curso.getNome(), escolaResponse);
-        MatrizResponse matrizResponse = new MatrizResponse(matriz.getId(), matriz.getCodigo(), cursoResponse);
+        List<MatrizResumida> matrizes = matrizDisciplinaRepository
+                .findByDisciplinaId(disciplina.getId())
+                .stream()
+                .map(md -> new MatrizResumida(md.getMatriz().getId(), md.getMatriz().getCodigo()))
+                .toList();
 
         return new DisciplinaResponse(
                 disciplina.getId(),
-                disciplina.getNome(),
+                disciplina.getSigla(),
+                disciplina.getDescricao(),
                 disciplina.getCargaHoraria(),
-                matrizResponse);
+                disciplina.getDataCadastro(),
+                disciplina.getStatus(),
+                disciplina.getEscolaId(),
+                escolaNome,
+                matrizes);
     }
 }

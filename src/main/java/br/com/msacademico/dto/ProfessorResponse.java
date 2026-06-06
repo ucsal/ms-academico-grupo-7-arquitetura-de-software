@@ -1,8 +1,13 @@
 package br.com.msacademico.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 public record ProfessorResponse(
-                Long id,
-                String nome,
-                String email,
-                String matricula) {
+        Long id,
+        @JsonAlias("nome") String nomeCompleto,
+        String email,
+        String matricula,
+        String telefone,
+        Long escolaId,
+        String status) {
 }

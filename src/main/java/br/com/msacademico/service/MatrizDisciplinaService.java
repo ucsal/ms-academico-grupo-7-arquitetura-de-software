@@ -35,6 +35,13 @@ public class MatrizDisciplinaService {
     }
 
     @Transactional(readOnly = true)
+    public List<MatrizDisciplinaResponse> listarTodas() {
+        return matrizDisciplinaRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<MatrizDisciplinaResponse> listarPorMatriz(Long matrizId) {
         buscarMatrizPorId(matrizId);
         return matrizDisciplinaRepository.findByMatrizId(matrizId).stream()
@@ -91,8 +98,7 @@ public class MatrizDisciplinaService {
     private MatrizDisciplina buscarEntidadePorId(Long id) {
         return matrizDisciplinaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Vinculo entre matriz e disciplina nao encontrado com id: " + id
-                ));
+                        "Vinculo entre matriz e disciplina nao encontrado com id: " + id));
     }
 
     private Matriz buscarMatrizPorId(Long id) {
@@ -114,7 +120,6 @@ public class MatrizDisciplinaService {
                 matriz.getId(),
                 matriz.getCodigo(),
                 disciplina.getId(),
-                disciplina.getNome()
-        );
+                disciplina.getNome());
     }
 }

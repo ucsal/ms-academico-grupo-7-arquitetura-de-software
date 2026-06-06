@@ -52,8 +52,8 @@ public class MatrizController {
     }
 
     @GetMapping("/todas")
-    public ResponseEntity<ApiResponse<List<MatrizResponse>>> listarTodas() {
-        return ResponseEntity.ok(ApiResponse.of("Matrizes listadas com sucesso.", matrizService.listarTodas()));
+    public ResponseEntity<List<MatrizResponse>> listarTodas() {
+        return ResponseEntity.ok(matrizService.listarTodas());
     }
 
     @GetMapping("/{id}")

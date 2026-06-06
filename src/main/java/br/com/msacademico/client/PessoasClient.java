@@ -14,6 +14,9 @@ public interface PessoasClient {
     @GetMapping("/api/alunos/{id}")
     AlunoResponse buscarAlunoPorId(@PathVariable Long id);
 
+    @GetMapping("/api/alunos/me")
+    AlunoResponse buscarAlunoAtual();
+
     @GetMapping("/api/professores/{id}")
     ProfessorResponse buscarProfessorPorId(@PathVariable Long id);
 

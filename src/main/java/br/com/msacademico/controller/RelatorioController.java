@@ -1,7 +1,6 @@
 package br.com.msacademico.controller;
 
 import br.com.msacademico.dto.AlunoResponse;
-import br.com.msacademico.dto.ApiResponse;
 import br.com.msacademico.dto.DisciplinaResponse;
 import br.com.msacademico.dto.EscolaResponse;
 import br.com.msacademico.dto.EspacoFisicoResponse;
@@ -23,28 +22,27 @@ public class RelatorioController {
     private final RelatorioService relatorioService;
 
     @GetMapping("/escolas")
-    public ResponseEntity<ApiResponse<List<EscolaResponse>>> escolas() {
-        return ResponseEntity.ok(ApiResponse.of("Relatorio de escolas.", relatorioService.relatorioEscolas()));
+    public ResponseEntity<List<EscolaResponse>> escolas() {
+        return ResponseEntity.ok(relatorioService.relatorioEscolas());
     }
 
     @GetMapping("/disciplinas")
-    public ResponseEntity<ApiResponse<List<DisciplinaResponse>>> disciplinas() {
-        return ResponseEntity.ok(ApiResponse.of("Relatorio de disciplinas.", relatorioService.relatorioDisciplinas()));
+    public ResponseEntity<List<DisciplinaResponse>> disciplinas() {
+        return ResponseEntity.ok(relatorioService.relatorioDisciplinas());
     }
 
     @GetMapping("/alunos")
-    public ResponseEntity<ApiResponse<List<AlunoResponse>>> alunos() {
-        return ResponseEntity.ok(ApiResponse.of("Relatorio de alunos.", relatorioService.relatorioAlunos()));
+    public ResponseEntity<List<AlunoResponse>> alunos() {
+        return ResponseEntity.ok(relatorioService.relatorioAlunos());
     }
 
     @GetMapping("/professores")
-    public ResponseEntity<ApiResponse<List<ProfessorResponse>>> professores() {
-        return ResponseEntity.ok(ApiResponse.of("Relatorio de professores.", relatorioService.relatorioProfessores()));
+    public ResponseEntity<List<ProfessorResponse>> professores() {
+        return ResponseEntity.ok(relatorioService.relatorioProfessores());
     }
 
     @GetMapping("/espacos-fisicos")
-    public ResponseEntity<ApiResponse<List<EspacoFisicoResponse>>> espacosFisicos() {
-        return ResponseEntity
-                .ok(ApiResponse.of("Relatorio de espacos fisicos.", relatorioService.relatorioEspacosFisicos()));
+    public ResponseEntity<List<EspacoFisicoResponse>> espacosFisicos() {
+        return ResponseEntity.ok(relatorioService.relatorioEspacosFisicos());
     }
 }
